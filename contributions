@@ -1,18 +1,21 @@
 #!/usr/bin/env sh
 set -e
 
+NODE_FIRST_REF=v0.9.0
+NODE_LAST_REF=HEAD
+
 echo Node.js contribution data as of $(date)
 
 git submodule update --init
+
+echo Node patches:
+echo
 
 cd node
 
 declare -a CONTRIBUTORS=()
 
-echo Node patches:
-echo
-
-git log --pretty=format:%aN v0.9.0..HEAD | sort | uniq -c | sort -nr | {\
+git log --pretty=format:%aN $NODE_FIRST_REF..$NODE_LAST_REF | sort | uniq -c | sort -nr | {\
   while read CONTRIB_LINE
   do
     echo $CONTRIB_LINE
@@ -28,7 +31,7 @@ git log --pretty=format:%aN v0.9.0..HEAD | sort | uniq -c | sort -nr | {\
     for CONTRIB_NAME in "${CONTRIBUTORS[@]}"
     do
       CLEANED_NAME=$(echo $CONTRIB_NAME)
-      echo $(git log --patch-with-stat --author="$CLEANED_NAME" v0.9.0..HEAD | wc -l) $CLEANED_NAME
+      echo $(git log --patch-with-stat --author="$CLEANED_NAME" $NODE_FIRST_REF..$NODE_LAST_REF | wc -l) $CLEANED_NAME
     done
   } | sort -nr
 }
