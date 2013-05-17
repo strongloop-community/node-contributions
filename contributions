@@ -4,6 +4,9 @@ set -e
 NODE_FIRST_REF=v0.9.0
 NODE_LAST_REF=HEAD
 
+LIBUV_FIRST_REF=node-v0.9.0
+LIBUV_LAST_REF=HEAD
+
 echo Node.js contribution data as of $(date)
 
 git submodule update --init
@@ -39,21 +42,34 @@ git log --pretty=format:%aN $NODE_FIRST_REF..$NODE_LAST_REF | sort | uniq -c | s
 cd -
 
 
+#########################
 
+echo libuv patches:
+echo
 
-# echo libuv patches:
-# pushd libuv
-#   git shortlog -ns node-v0.9.0..HEAD | while read contributor_line ; do
-#     echo $contributor_line
-#   done
-# popd
-# 
-# echo Node LoC:
-# pushd node
-#   
-# popd
-# 
-# echo libuv LoC:
-# pushd libuv
-#   
-# popd
+cd libuv
+
+declare -a CONTRIBUTORS=()
+
+git log --pretty=format:%aN $LIBUV_FIRST_REF..$LIBUV_LAST_REF | sort | uniq -c | sort -nr | {\
+  while read CONTRIB_LINE
+  do
+    echo $CONTRIB_LINE
+    CONTRIB_NAME=$(echo $CONTRIB_LINE | awk '{sub($1,"");print}')
+    CONTRIBUTORS+=("$CONTRIB_NAME")
+  done
+
+  echo
+  echo libuv LoC:
+  echo
+
+  {\
+    for CONTRIB_NAME in "${CONTRIBUTORS[@]}"
+    do
+      CLEANED_NAME=$(echo $CONTRIB_NAME)
+      echo $(git log --patch-with-stat --author="$CLEANED_NAME" $LIBUV_FIRST_REF..$LIBUV_LAST_REF | wc -l) $CLEANED_NAME
+    done
+  } | sort -nr
+}
+
+cd -
