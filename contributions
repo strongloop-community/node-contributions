@@ -41,6 +41,18 @@ git log --pretty=format:%aN $NODE_FIRST_REF..$NODE_LAST_REF | sort | uniq -c | s
       echo $(git log --patch-with-stat --author="$CLEANED_NAME" $NODE_FIRST_REF..$NODE_LAST_REF | wc -l) $CLEANED_NAME
     done
   } | sort -nr
+
+  echo
+  echo Node lines added or changed:
+  echo
+  
+  {\
+    for CONTRIB_NAME in "${CONTRIBUTORS[@]}"
+    do
+      CLEANED_NAME=$(echo $CONTRIB_NAME)
+      echo $(git log --oneline --shortstat --author="$CLEANED_NAME" $NODE_FIRST_REF..$NODE_LAST_REF | grep "^ " | awk '{print $4}' | paste -sd+ - | bc) $CLEANED_NAME
+    done
+  } | sort -nr
 }
 
 echo
@@ -71,6 +83,18 @@ git log --pretty=format:%aN $LIBUV_FIRST_REF..$LIBUV_LAST_REF | sort | uniq -c |
     do
       CLEANED_NAME=$(echo $CONTRIB_NAME)
       echo $(git log --patch-with-stat --author="$CLEANED_NAME" $LIBUV_FIRST_REF..$LIBUV_LAST_REF | wc -l) $CLEANED_NAME
+    done
+  } | sort -nr
+
+  echo
+  echo libuv lines added or changed:
+  echo
+  
+  {\
+    for CONTRIB_NAME in "${CONTRIBUTORS[@]}"
+    do
+      CLEANED_NAME=$(echo $CONTRIB_NAME)
+      echo $(git log --oneline --shortstat --author="$CLEANED_NAME" $LIBUV_FIRST_REF..$LIBUV_LAST_REF | grep "^ " | awk '{print $4}' | paste -sd+ - | bc) $CLEANED_NAME
     done
   } | sort -nr
 }
