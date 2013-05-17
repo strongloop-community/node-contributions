@@ -7,14 +7,18 @@ NODE_LAST_REF=HEAD
 LIBUV_FIRST_REF=node-v0.9.0
 LIBUV_LAST_REF=HEAD
 
+BASEDIR=$PWD
+
 echo Node.js contribution data as of $(date)
+
+echo
 
 git submodule update --init
 
 echo Node patches:
 echo
 
-cd node
+cd $BASEDIR/node
 
 declare -a CONTRIBUTORS=()
 
@@ -39,15 +43,14 @@ git log --pretty=format:%aN $NODE_FIRST_REF..$NODE_LAST_REF | sort | uniq -c | s
   } | sort -nr
 }
 
-cd -
-
+echo
 
 #########################
 
 echo libuv patches:
 echo
 
-cd libuv
+cd $BASEDIR/libuv
 
 declare -a CONTRIBUTORS=()
 
@@ -71,5 +74,3 @@ git log --pretty=format:%aN $LIBUV_FIRST_REF..$LIBUV_LAST_REF | sort | uniq -c |
     done
   } | sort -nr
 }
-
-cd -
