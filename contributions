@@ -1,0 +1,54 @@
+#!/usr/bin/env sh
+set -e
+
+echo Node.js contribution data as of $(date)
+
+git submodule update --init
+
+cd node
+
+CONTRIB_ADDRS=
+
+echo Node patches:
+echo
+
+git log --pretty=format:"%ae %aN" v0.9.0..HEAD | sort | uniq -c | sort -nr | {\
+  while read CONTRIB_LINE
+  do
+    echo $CONTRIB_LINE | awk '{gsub($2,"");print}'
+    export CONTRIB_ADDRS="$CONTRIB_ADDRS $(echo $CONTRIB_LINE | awk '{print $2}')"
+  done
+
+  echo
+  echo Node LoC:
+  echo
+
+  {\
+    for ADDR in $CONTRIB_ADDRS
+    do
+      echo $(git log --patch-with-stat --author=$ADDR v0.9.0..HEAD | wc -l) $ADDR
+    done
+  } | sort -nr
+}
+
+cd -
+
+
+
+
+# echo libuv patches:
+# pushd libuv
+#   git shortlog -ns node-v0.9.0..HEAD | while read contributor_line ; do
+#     echo $contributor_line
+#   done
+# popd
+# 
+# echo Node LoC:
+# pushd node
+#   
+# popd
+# 
+# echo libuv LoC:
+# pushd libuv
+#   
+# popd
