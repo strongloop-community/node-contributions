@@ -1,6 +1,0 @@
-[submodule "node"]
-	path = node
-	url = https://github.com/joyent/node.git
-[submodule "libuv"]
-	path = libuv
-	url = https://github.com/joyent/libuv.git
