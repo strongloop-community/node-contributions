@@ -13,7 +13,23 @@ echo Node.js contribution data as of $(date)
 
 echo
 
-git submodule update --init
+if [ -d node ]
+then
+  cd node
+  git fetch --all
+  cd -
+else
+  git clone https://github.com/joyent/node.git
+fi
+
+if [ -d libuv ]
+then
+  cd libuv
+  git fetch --all
+  cd -
+else
+  git clone https://github.com/joyent/libuv.git
+fi
 
 echo Node patches:
 echo
@@ -22,7 +38,7 @@ cd $BASEDIR/node
 
 declare -a CONTRIBUTORS=()
 
-git log --pretty=format:%aN $NODE_FIRST_REF..$NODE_LAST_REF | sort | uniq -c | sort -nr | {\
+git log --all --pretty=format:%aN $NODE_FIRST_REF..$NODE_LAST_REF | sort | uniq -c | sort -nr | {\
   while read CONTRIB_LINE
   do
     echo $CONTRIB_LINE
@@ -38,7 +54,7 @@ git log --pretty=format:%aN $NODE_FIRST_REF..$NODE_LAST_REF | sort | uniq -c | s
     for CONTRIB_NAME in "${CONTRIBUTORS[@]}"
     do
       CLEANED_NAME=$(echo $CONTRIB_NAME)
-      echo $(git log --patch-with-stat --author="$CLEANED_NAME" $NODE_FIRST_REF..$NODE_LAST_REF | wc -l) $CLEANED_NAME
+      echo $(git log --all --patch-with-stat --author="$CLEANED_NAME" $NODE_FIRST_REF..$NODE_LAST_REF | wc -l) $CLEANED_NAME
     done
   } | sort -nr
 
@@ -50,7 +66,7 @@ git log --pretty=format:%aN $NODE_FIRST_REF..$NODE_LAST_REF | sort | uniq -c | s
     for CONTRIB_NAME in "${CONTRIBUTORS[@]}"
     do
       CLEANED_NAME=$(echo $CONTRIB_NAME)
-      echo $(git log --oneline --shortstat --author="$CLEANED_NAME" $NODE_FIRST_REF..$NODE_LAST_REF | grep "^ " | awk '{print $4}' | paste -sd+ - | bc) $CLEANED_NAME
+      echo $(git log --all --oneline --shortstat --author="$CLEANED_NAME" $NODE_FIRST_REF..$NODE_LAST_REF | grep "^ " | awk '{print $4}' | paste -sd+ - | bc) $CLEANED_NAME
     done
   } | sort -nr
 }
