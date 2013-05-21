@@ -17,6 +17,7 @@ if [ -d node ]
 then
   cd node
   git fetch --all
+  git pull
   cd -
 else
   git clone https://github.com/joyent/node.git
@@ -26,6 +27,7 @@ if [ -d libuv ]
 then
   cd libuv
   git fetch --all
+  git pull
   cd -
 else
   git clone https://github.com/joyent/libuv.git
@@ -71,7 +73,7 @@ git log --all --pretty=format:"%aE %aN" $NODE_FIRST_REF..$NODE_LAST_REF | sort |
     do
       CLEANED_EMAIL=$(echo $CONTRIBUTOR | awk '{print($1)}')
       CLEANED_NAME=$(echo $CONTRIBUTOR | awk '{sub($1,"");print}') # strip email
-      echo $(git log --all --oneline --shortstat --author="$CLEANED_EMAIL" $NODE_FIRST_REF..$NODE_LAST_REF | grep "^ " | awk '{print $4}' | paste -sd+ - | bc) $CLEANED_NAME
+      echo $(git log --all --oneline --shortstat --author="$CLEANED_EMAIL" $NODE_FIRST_REF..$NODE_LAST_REF | grep "^ " | grep " insertion" | awk '{print $4}' | paste -sd+ - | bc) $CLEANED_NAME
     done
   } | sort -nr
 }
@@ -119,7 +121,7 @@ git log --all --pretty=format:"%aE %aN" $LIBUV_FIRST_REF..$LIBUV_LAST_REF | sort
     do
       CLEANED_EMAIL=$(echo $CONTRIBUTOR | awk '{print($1)}')
       CLEANED_NAME=$(echo $CONTRIBUTOR | awk '{sub($1,"");print}') # strip email
-      echo $(git log --all --oneline --shortstat --author="$CLEANED_EMAIL" $LIBUV_FIRST_REF..$LIBUV_LAST_REF | grep "^ " | awk '{print $4}' | paste -sd+ - | bc) $CLEANED_NAME
+      echo $(git log --all --oneline --shortstat --author="$CLEANED_EMAIL" $LIBUV_FIRST_REF..$LIBUV_LAST_REF | grep "^ " | grep " insertion" | awk '{print $4}' | paste -sd+ - | bc) $CLEANED_NAME
     done
   } | sort -nr
 }
