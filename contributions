@@ -31,6 +31,7 @@ else
   git clone https://github.com/joyent/libuv.git
 fi
 
+echo
 echo Node patches:
 echo
 
@@ -38,12 +39,14 @@ cd $BASEDIR/node
 
 declare -a CONTRIBUTORS=()
 
-git log --all --pretty=format:%aN $NODE_FIRST_REF..$NODE_LAST_REF | sort | uniq -c | sort -nr | {\
+git log --all --pretty=format:"%aE %aN" $NODE_FIRST_REF..$NODE_LAST_REF | sort | uniq -c | sort -nr | {\
   while read CONTRIB_LINE
   do
-    echo $CONTRIB_LINE
+    CONTRIB_EMAIL=$(echo $CONTRIB_LINE | awk '{print($2)}')
+    CONTRIB_LINE=$(echo $CONTRIB_LINE | awk '{sub($2,"");print}') # strip email
     CONTRIB_NAME=$(echo $CONTRIB_LINE | awk '{sub($1,"");print}')
-    CONTRIBUTORS+=("$CONTRIB_NAME")
+    CONTRIBUTORS+=("$CONTRIB_EMAIL $CONTRIB_NAME")
+    echo $CONTRIB_LINE
   done
 
   echo
@@ -51,10 +54,11 @@ git log --all --pretty=format:%aN $NODE_FIRST_REF..$NODE_LAST_REF | sort | uniq 
   echo
 
   {\
-    for CONTRIB_NAME in "${CONTRIBUTORS[@]}"
+    for CONTRIBUTOR in "${CONTRIBUTORS[@]}"
     do
-      CLEANED_NAME=$(echo $CONTRIB_NAME)
-      echo $(git log --all --patch-with-stat --author="$CLEANED_NAME" $NODE_FIRST_REF..$NODE_LAST_REF | wc -l) $CLEANED_NAME
+      CLEANED_EMAIL=$(echo $CONTRIBUTOR | awk '{print($1)}')
+      CLEANED_NAME=$(echo $CONTRIBUTOR | awk '{sub($1,"");print}') # strip email
+      echo $(git log --all --patch-with-stat --author="$CLEANED_EMAIL" $NODE_FIRST_REF..$NODE_LAST_REF | wc -l) $CLEANED_NAME
     done
   } | sort -nr
 
@@ -63,10 +67,11 @@ git log --all --pretty=format:%aN $NODE_FIRST_REF..$NODE_LAST_REF | sort | uniq 
   echo
   
   {\
-    for CONTRIB_NAME in "${CONTRIBUTORS[@]}"
+    for CONTRIBUTOR in "${CONTRIBUTORS[@]}"
     do
-      CLEANED_NAME=$(echo $CONTRIB_NAME)
-      echo $(git log --all --oneline --shortstat --author="$CLEANED_NAME" $NODE_FIRST_REF..$NODE_LAST_REF | grep "^ " | awk '{print $4}' | paste -sd+ - | bc) $CLEANED_NAME
+      CLEANED_EMAIL=$(echo $CONTRIBUTOR | awk '{print($1)}')
+      CLEANED_NAME=$(echo $CONTRIBUTOR | awk '{sub($1,"");print}') # strip email
+      echo $(git log --all --oneline --shortstat --author="$CLEANED_EMAIL" $NODE_FIRST_REF..$NODE_LAST_REF | grep "^ " | awk '{print $4}' | paste -sd+ - | bc) $CLEANED_NAME
     done
   } | sort -nr
 }
@@ -82,12 +87,14 @@ cd $BASEDIR/libuv
 
 declare -a CONTRIBUTORS=()
 
-git log --pretty=format:%aN $LIBUV_FIRST_REF..$LIBUV_LAST_REF | sort | uniq -c | sort -nr | {\
+git log --all --pretty=format:"%aE %aN" $LIBUV_FIRST_REF..$LIBUV_LAST_REF | sort | uniq -c | sort -nr | {\
   while read CONTRIB_LINE
   do
-    echo $CONTRIB_LINE
+    CONTRIB_EMAIL=$(echo $CONTRIB_LINE | awk '{print($2)}')
+    CONTRIB_LINE=$(echo $CONTRIB_LINE | awk '{sub($2,"");print}') # strip email
     CONTRIB_NAME=$(echo $CONTRIB_LINE | awk '{sub($1,"");print}')
-    CONTRIBUTORS+=("$CONTRIB_NAME")
+    CONTRIBUTORS+=("$CONTRIB_EMAIL $CONTRIB_NAME")
+    echo $CONTRIB_LINE
   done
 
   echo
@@ -95,10 +102,11 @@ git log --pretty=format:%aN $LIBUV_FIRST_REF..$LIBUV_LAST_REF | sort | uniq -c |
   echo
 
   {\
-    for CONTRIB_NAME in "${CONTRIBUTORS[@]}"
+    for CONTRIBUTOR in "${CONTRIBUTORS[@]}"
     do
-      CLEANED_NAME=$(echo $CONTRIB_NAME)
-      echo $(git log --patch-with-stat --author="$CLEANED_NAME" $LIBUV_FIRST_REF..$LIBUV_LAST_REF | wc -l) $CLEANED_NAME
+      CLEANED_EMAIL=$(echo $CONTRIBUTOR | awk '{print($1)}')
+      CLEANED_NAME=$(echo $CONTRIBUTOR | awk '{sub($1,"");print}') # strip email
+      echo $(git log --all --patch-with-stat --author="$CLEANED_EMAIL" $LIBUV_FIRST_REF..$LIBUV_LAST_REF | wc -l) $CLEANED_NAME
     done
   } | sort -nr
 
@@ -107,10 +115,11 @@ git log --pretty=format:%aN $LIBUV_FIRST_REF..$LIBUV_LAST_REF | sort | uniq -c |
   echo
   
   {\
-    for CONTRIB_NAME in "${CONTRIBUTORS[@]}"
+    for CONTRIBUTOR in "${CONTRIBUTORS[@]}"
     do
-      CLEANED_NAME=$(echo $CONTRIB_NAME)
-      echo $(git log --oneline --shortstat --author="$CLEANED_NAME" $LIBUV_FIRST_REF..$LIBUV_LAST_REF | grep "^ " | awk '{print $4}' | paste -sd+ - | bc) $CLEANED_NAME
+      CLEANED_EMAIL=$(echo $CONTRIBUTOR | awk '{print($1)}')
+      CLEANED_NAME=$(echo $CONTRIBUTOR | awk '{sub($1,"");print}') # strip email
+      echo $(git log --all --oneline --shortstat --author="$CLEANED_EMAIL" $LIBUV_FIRST_REF..$LIBUV_LAST_REF | grep "^ " | awk '{print $4}' | paste -sd+ - | bc) $CLEANED_NAME
     done
   } | sort -nr
 }
